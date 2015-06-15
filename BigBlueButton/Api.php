@@ -127,4 +127,9 @@ class Api
 
         return $this->serverUrl . 'api/end?' . $parameters . '&checksum=' . $this->getChecksum('join', $parameters);
     }
+
+    public function endMeeting($endParameters)
+    {
+        return $this->xmlResponse($this->getEndMeetingUrl($endParameters));
+    }
 }
