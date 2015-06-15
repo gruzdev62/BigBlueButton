@@ -18,7 +18,7 @@ class Api
 
     private function xmlResponse($url, $xml = '')
     {
-        if (!extension_loaded('curl' && !empty($xml))) {
+        if (!extension_loaded('curl') && !empty($xml)) {
             throw new Exception('Curl does not installed.');
         }
 
@@ -55,7 +55,7 @@ class Api
             }
 
         } catch (Exception $error) {
-            echo $error;
+            // echo $error->getMessage();
         }
 
         return simplexml_load_file($url);
@@ -158,7 +158,7 @@ class Api
     public function getMeetingInfoUrl($infoParameters)
     {
         $infoParameters['meetingId'] = $this->requiredParameters($infoParameters['meetingId'], 'meetingId');
-        $infoParameters['password'] = $this->requiredParameters($infoParameters['password'], 'password');
+        $infoParameters['password']  = $this->requiredParameters($infoParameters['password'], 'password');
 
         $parameters = $this->implodeParameters($infoParameters);
 
