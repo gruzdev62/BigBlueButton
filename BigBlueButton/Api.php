@@ -12,8 +12,8 @@ class Api
 
     public function __construct()
     {
-        $this->secretSalt  = '';
-        $this->serverUrl   = '';
+        $this->secretSalt = '';
+        $this->serverUrl  = '';
     }
 
     private function xmlResponse($url, $xml = '')
@@ -134,13 +134,40 @@ class Api
     public function getIsMeetingRunningUrl($parameters)
     {
         $parameters['meetingId'] = $this->requiredParameters($parameters['meetingId'], 'meetingId');
-        $parameters = $this->implodeParameters($parameters);
+        $parameters              = $this->implodeParameters($parameters);
 
-        return $this->serverUrl . 'api/isMeetingRunning' . $parameters . '&checksum=' . $this->getChecksum('isMeetingRunning', $parameters);
+        return $this->serverUrl . 'api/isMeetingRunning?' . $parameters . '&checksum=' . $this->getChecksum('isMeetingRunning',
+            $parameters);
     }
 
     public function isMeetingRunning($parameters)
     {
         return $this->xmlResponse($this->getIsMeetingRunningUrl($parameters));
+    }
+
+    public function getMeetingsUrl()
+    {
+        return $this->serverUrl . 'api/getMeetings?checksum=' . $this->getChecksum('getMeetings', '');
+    }
+
+    public function getMeetings()
+    {
+        return $this->xmlResponse($this->getMeetingsUrl());
+    }
+
+    public function getMeetingInfoUrl($infoParameters)
+    {
+        $infoParameters['meetingId'] = $this->requiredParameters($infoParameters['meetingId'], 'meetingId');
+        $infoParameters['password'] = $this->requiredParameters($infoParameters['password'], 'password');
+
+        $parameters = $this->implodeParameters($infoParameters);
+
+        return $this->serverUrl . 'api/getMeetingInfo?' . $parameters . '&checksum=' . $this->getChecksum('getMeetingInfo',
+            $parameters);
+    }
+
+    public function getMeetingInfo($infoParameters)
+    {
+        return $this->xmlResponse($this->getMeetingInfoUrl($infoParameters));
     }
 }
