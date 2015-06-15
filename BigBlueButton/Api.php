@@ -106,15 +106,25 @@ class Api
     {
         return $this->xmlResponse($this->getCreateMeetingUrl($creationParameters), $xml);
     }
-    
+
     public function getJoinMeetingUrl($joinParameters)
     {
-        $joinParameters['meetingId']  = $this->requiredParameters($joinParameters['meetingId'], 'meetingId');
-        $joinParameters['username']   = $this->requiredParameters($joinParameters['username'], 'username');
-        $joinParameters['parameters'] = $this->requiredParameters($joinParameters['password'], 'password');
+        $joinParameters['meetingId'] = $this->requiredParameters($joinParameters['meetingId'], 'meetingId');
+        $joinParameters['username']  = $this->requiredParameters($joinParameters['username'], 'username');
+        $joinParameters['password']  = $this->requiredParameters($joinParameters['password'], 'password');
 
         $parameters = $this->implodeParameters($joinParameters);
 
         return $this->serverUrl . 'api/join?' . $parameters . '&checksum=' . $this->getChecksum('join', $parameters);
+    }
+
+    public function getEndMeetingUrl($endParameters)
+    {
+        $endParameters['meetingId'] = $this->requiredParameters($endParameters['meetingId'], 'meetingId');
+        $endParameters['password']  = $this->requiredParameters($endParameters['password'], 'password');
+
+        $parameters = $this->implodeParameters($endParameters);
+
+        return $this->serverUrl . 'api/end?' . $parameters . '&checksum=' . $this->getChecksum('join', $parameters);
     }
 }
