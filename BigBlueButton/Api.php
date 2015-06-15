@@ -9,13 +9,11 @@ class Api
 {
     private $secretSalt;
     private $serverUrl;
-    private $curlTimeout;
 
     public function __construct()
     {
         $this->secretSalt  = '';
         $this->serverUrl   = '';
-        $this->curlTimeout = 10;
     }
 
     private function xmlResponse($url, $xml = '')
@@ -32,7 +30,7 @@ class Api
             }
 
             curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-            curl_setopt($ch, CURLOPT_TIMEOUT, $this->curlTimeout);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 10);
             curl_setopt($ch, CURLOPT_URL, $url);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 
@@ -125,11 +123,24 @@ class Api
 
         $parameters = $this->implodeParameters($endParameters);
 
-        return $this->serverUrl . 'api/end?' . $parameters . '&checksum=' . $this->getChecksum('join', $parameters);
+        return $this->serverUrl . 'api/end?' . $parameters . '&checksum=' . $this->getChecksum('end', $parameters);
     }
 
     public function endMeeting($endParameters)
     {
         return $this->xmlResponse($this->getEndMeetingUrl($endParameters));
+    }
+
+    public function getIsMeetingRunningUrl($parameters)
+    {
+        $parameters['meetingId'] = $this->requiredParameters($parameters['meetingId'], 'meetingId');
+        $parameters = $this->implodeParameters($parameters);
+
+        return $this->serverUrl . 'api/isMeetingRunning' . $parameters . '&checksum=' . $this->getChecksum('isMeetingRunning', $parameters);
+    }
+
+    public function isMeetingRunning($parameters)
+    {
+        return $this->xmlResponse($this->getIsMeetingRunningUrl($parameters));
     }
 }
