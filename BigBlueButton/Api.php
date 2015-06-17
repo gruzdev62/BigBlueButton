@@ -158,7 +158,7 @@ class Api
      * ***************** welcome                 => приветственное сообщение,
      * ***************** dialNumber              => внешний номер конференции,
      * ***************** webVoice                => ? (TODO: уточнить),
-     * ***************** logoutULL               => URL, на который происходит редирект при выходе из конференции,
+     * ***************** logoutURL               => URL, на который происходит редирект при выходе из конференции,
      * ***************** record                  => запись конференции, по умолчанию false,
      * ***************** duration                => продолжительность конференции в минутах,
      * ***************** meta                    => дополнительные параметры для getMeetingInfo и getRecordings,
@@ -172,58 +172,71 @@ class Api
      */
     public function createMeeting($parameters, $xml = '')
     {
-        $parameters['meetingId']   = $this->requiredParameters($parameters['meetingId'], 'meetingId');
+        $parameters['meetingID'] = $this->requiredParameters($parameters['meetingId'], 'meetingId');
 
         return $this->xmlResponse($this->getUrl('create', $parameters), $xml);
     }
 
     /**
      * Генерирует ссылку на присоединение к конференции
-     * @param array $joinParameters параметры конференции (TODO: уточнить формат массива)
+     * @param array $parameters [
+     * ***************** fullName     => Имя присоединяющегося участника (обязательно),
+     * ***************** meetingID    => уникальный ID конференции (обязательно),
+     * ***************** password     => пароль участника или модератора (обязательно),
+     * ***************** createTime   => ? (TODO: уточнить),
+     * ***************** userID       => уникальный ID участника,
+     * ***************** webVoiceConf => ? (TODO: уточнить),
+     * ***************** configToken  => ? (TODO: уточнить),
+     * ***************** avatarURL    => линк на аватарку,
+     * ***************** redirect     => ? (TODO: уточнить),
+     * ***************** clientURL    => URL собственного BigBlueButton-клиента
+     * **************** ]
      * @return string ссылка на присоединение к конференции
      * @throws Exception
      */
-    public function getJoinMeetingUrl($joinParameters)
+    public function joinMeeting($parameters)
     {
-        $joinParameters['meetingId'] = $this->requiredParameters($joinParameters['meetingId'], 'meetingId');
-        $joinParameters['username']  = $this->requiredParameters($joinParameters['username'], 'username');
-        $joinParameters['password']  = $this->requiredParameters($joinParameters['password'], 'password');
+        $parameters['fullName']  = $this->requiredParameters($parameters['fullName'], 'fullName');
+        $parameters['meetingID'] = $this->requiredParameters($parameters['meetingID'], 'meetingId');
+        $parameters['password']  = $this->requiredParameters($parameters['password'], 'password');
 
-        $parameters = $this->implodeParameters($joinParameters);
+        $parameters = $this->implodeParameters($parameters);
 
-        return $this->serverUrl . 'api/join?' . $parameters . '&checksum=' . $this->getChecksum('join', $parameters);
+        return $this->xmlResponse($this->getUrl('join', $parameters));
     }
 
     /**
      * Завершает конференцию с заданными параметрами и возвращает результат
-     * @param array $endParameters параметры завершаемой конференции (TODO: уточнить формат массива)
+     * @param array $parameters [
+     * ***************** meetingID => уникальный ID конференции (обязательно),
+     * ***************** password  => пароль модератора конференции (обязательно),
+     * **************** ]
      * @return SimpleXMLElement объект xml с результатом завершения
      * @throws Exception
      */
     public function endMeeting($parameters)
     {
-        $parameters['meetingId'] = $this->requiredParameters($parameters['meetingId'], 'meetingId');
+        $parameters['meetingID'] = $this->requiredParameters($parameters['meetingID'], 'meetingID');
         $parameters['password']  = $this->requiredParameters($parameters['password'], 'password');
 
         return $this->xmlResponse($this->getUrl('end', $parameters));
     }
 
     /**
-     * Проверяет, запущена ли конференция с таким meetingId
-     * @param array $parameters массив с одним элементом: meetingId => value
+     * Проверяет, запущена ли конференция с таким meetingID
+     * @param string $meetingID уникальный ID конференции
      * @return SimpleXMLElement результат проверки в виде объекта xml
      * @throws Exception
      */
-    public function isMeetingRunning($parameters)
+    public function isMeetingRunning($meetingID)
     {
-        $parameters['meetingId'] = $this->requiredParameters($parameters['meetingId'], 'meetingId');
+        $parameters['meetingID'] = $this->requiredParameters($meetingID, 'meetingId');
 
         return $this->xmlResponse($this->getUrl('isMeetingRunning', $parameters));
     }
 
     /**
-     * Возвращает информацию обо всех запущенных (TODO: или не только запущенных?)
-     * конференциях
+     * Возвращает информацию обо всех конференциях
      * @return SimpleXMLElement ответ api в виде объекта xml
      * @throws Exception
      */
@@ -233,35 +246,19 @@ class Api
     }
 
     /**
-     * Возвращает ссылку на получение информации о конференции
-     * @param array $infoParameters параметры конференции (TODO: уточнить формат массива)
-     * @return string ссылка на получение информации о конференции
-     * @throws Exception
-     */
-    public function getMeetingInfoUrl($infoParameters)
-    {
-        $infoParameters['meetingId'] = $this->requiredParameters($infoParameters['meetingId'], 'meetingId');
-        $infoParameters['password']  = $this->requiredParameters($infoParameters['password'], 'password');
-
-        $parameters = $this->implodeParameters($infoParameters);
-
-        return $this->serverUrl . 'api/getMeetingInfo?' . $parameters . '&checksum=' . $this->getChecksum('getMeetingInfo',
-            $parameters);
-    }
-
-    /**
      * Получает информацию о конференции
-     * @param array $infoParameters параметры конференции (TODO: уточнить формат массива)
+     * @param array $parameters [
+     * ***************** meetingID => уникальный ID конференции (обязательно),
+     * ***************** password  => пароль модератора конференции (обязательно),
+     * **************** ]
      * @return SimpleXMLElement информация о конференции в виде объекта xml
      * @throws Exception
      */
     public function getMeetingInfo($parameters)
     {
-        $parameters['meetingId'] = $this->requiredParameters($parameters['meetingId'], 'meetingId');
+        $parameters['meetingID'] = $this->requiredParameters($parameters['meetingId'], 'meetingId');
         $parameters['password']  = $this->requiredParameters($parameters['password'], 'password');
 
         return $this->xmlResponse($this->getUrl('getMeetingInfo', $parameters));
     }
-
-
 }
