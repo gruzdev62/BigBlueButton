@@ -18,7 +18,6 @@ class Api
      */
     private $secretSalt;
 
-
     /**
      * @var string адрес, по которому установлен BigBlueButton.
      */
@@ -151,7 +150,22 @@ class Api
 
     /**
      * Создает конференцию с заданными и возвращает информацию о ней
-     * @param array $parameters параметры создаваемой конференции (TODO: уточнить формат массива)
+     * @param array $parameters [
+     * ***************** name                    => Имя конференции,
+     * ***************** meetingID               => уникальный ID конференции (обязательно),
+     * ***************** attendeePW              => пароль участника, по умолчанию случайный
+     * ***************** moderatorPW             => пароль модератора, по умолчанию случайный,
+     * ***************** welcome                 => приветственное сообщение,
+     * ***************** dialNumber              => внешний номер конференции,
+     * ***************** webVoice                => ? (TODO: уточнить),
+     * ***************** logoutULL               => URL, на который происходит редирект при выходе из конференции,
+     * ***************** record                  => запись конференции, по умолчанию false,
+     * ***************** duration                => продолжительность конференции в минутах,
+     * ***************** meta                    => дополнительные параметры для getMeetingInfo и getRecordings,
+     * ***************** moderatorOnlyMessage    => сообщение, которое увидят в чате только модераторы,
+     * ***************** autoStartRecording      => автоматический старт записи конференции, по умолчанию false,
+     * ***************** allowStartStopRecording => разрешить начинать и заканчивать запись конференции вручную, по умолчанию true
+     * **************** ]
      * @param string $xml дополнительные параметры в виде xml
      * @return SimpleXMLElement информация о созданной конференции в виде объекта xml
      * @throws Exception
@@ -159,7 +173,6 @@ class Api
     public function createMeeting($parameters, $xml = '')
     {
         $parameters['meetingId']   = $this->requiredParameters($parameters['meetingId'], 'meetingId');
-        $parameters['meetingName'] = $this->requiredParameters($parameters['meetingName'], 'meetingName');
 
         return $this->xmlResponse($this->getUrl('create', $parameters), $xml);
     }
