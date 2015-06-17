@@ -10,7 +10,6 @@ use SimpleXMLElement;
  * @package BigBlueButton
  * @author fkulakov
  * @email fkulakov@gmail.com
- * TODO: ссылки для всех методов api формируются похожим образом. Стоит подумать об одном методе для их получения.
  */
 class Api
 {
@@ -130,37 +129,39 @@ class Api
      */
     private function getChecksum($methodName, $parameters)
     {
+
         return sha1($methodName . $parameters . $this->secretSalt);
     }
 
     /**
-     * Возвращает ссылку на создание конференции с заданными параметрами.
-     * @param array $creationParameters параметры конференции
-     * @return string ссылка на создание конференции
-     * @throws Exception
+     * @param string $methodName метод, к которому формируется запрос
+     * @param mixed $parameters массив c параметрами запроса или пустая строка
+     * @return string
      */
-    public function getCreateMeetingUrl($creationParameters)
+    private function getUrl($methodName, $parameters = '')
     {
-        $creationParameters['meetingId']   = $this->requiredParameters($creationParameters['meetingId'], 'meetingId');
-        $creationParameters['meetingName'] = $this->requiredParameters($creationParameters['meetingName'],
-            'meetingName');
+        if ($parameters != '' && is_array($parameters)) {
+            $parameters = $this->implodeParameters($parameters);
 
-        $parameters = $this->implodeParameters($creationParameters);
+            return $this->serverUrl . 'api/' . $methodName . '?' . $parameters . '&checksum=' . $this->getChecksum($methodName, $parameters);
+        }
 
-        return $this->serverUrl . 'api/create?' . $parameters . '&checksum=' . $this->getChecksum('create',
-            $parameters);
+        return $this->serverUrl . 'api/' . $methodName . '?checksum=' . $this->getChecksum($methodName, $parameters);
     }
 
     /**
      * Создает конференцию с заданными и возвращает информацию о ней
-     * @param array $creationParameters параметры создаваемой конференции (TODO: уточнить формат массива)
+     * @param array $parameters параметры создаваемой конференции (TODO: уточнить формат массива)
      * @param string $xml дополнительные параметры в виде xml
      * @return SimpleXMLElement информация о созданной конференции в виде объекта xml
      * @throws Exception
      */
-    public function createMeeting($creationParameters, $xml = '')
+    public function createMeeting($parameters, $xml = '')
     {
-        return $this->xmlResponse($this->getCreateMeetingUrl($creationParameters), $xml);
+        $parameters['meetingId']   = $this->requiredParameters($parameters['meetingId'], 'meetingId');
+        $parameters['meetingName'] = $this->requiredParameters($parameters['meetingName'], 'meetingName');
+
+        return $this->xmlResponse($this->getUrl('create', $parameters), $xml);
     }
 
     /**
@@ -181,45 +182,17 @@ class Api
     }
 
     /**
-     * Генерирует ссылку на завершение конференции
-     * @param array $endParameters параметры завершаемой конференции (TODO: уточнить формат массива)
-     * @return string ссылка на завершение конференции
-     * @throws Exception
-     */
-    public function getEndMeetingUrl($endParameters)
-    {
-        $endParameters['meetingId'] = $this->requiredParameters($endParameters['meetingId'], 'meetingId');
-        $endParameters['password']  = $this->requiredParameters($endParameters['password'], 'password');
-
-        $parameters = $this->implodeParameters($endParameters);
-
-        return $this->serverUrl . 'api/end?' . $parameters . '&checksum=' . $this->getChecksum('end', $parameters);
-    }
-
-    /**
      * Завершает конференцию с заданными параметрами и возвращает результат
      * @param array $endParameters параметры завершаемой конференции (TODO: уточнить формат массива)
      * @return SimpleXMLElement объект xml с результатом завершения
      * @throws Exception
      */
-    public function endMeeting($endParameters)
-    {
-        return $this->xmlResponse($this->getEndMeetingUrl($endParameters));
-    }
-
-    /**
-     * Ссылка, по которой можно проверить, запущена ли конференция с таким meetingId
-     * @param array $parameters массив с одним элементом: meetingId => value
-     * @return string ссылка на проверку
-     * @throws Exception
-     */
-    public function getIsMeetingRunningUrl($parameters)
+    public function endMeeting($parameters)
     {
         $parameters['meetingId'] = $this->requiredParameters($parameters['meetingId'], 'meetingId');
-        $parameters              = $this->implodeParameters($parameters);
+        $parameters['password']  = $this->requiredParameters($parameters['password'], 'password');
 
-        return $this->serverUrl . 'api/isMeetingRunning?' . $parameters . '&checksum=' . $this->getChecksum('isMeetingRunning',
-            $parameters);
+        return $this->xmlResponse($this->getUrl('end', $parameters));
     }
 
     /**
@@ -230,17 +203,9 @@ class Api
      */
     public function isMeetingRunning($parameters)
     {
-        return $this->xmlResponse($this->getIsMeetingRunningUrl($parameters));
-    }
+        $parameters['meetingId'] = $this->requiredParameters($parameters['meetingId'], 'meetingId');
 
-    /**
-     * Возвращает ссылку для получения всех запущенных (TODO: или не только запущенных?)
-     * конференций
-     * @return string ссылка для получения всех запущенных конференций
-     */
-    public function getMeetingsUrl()
-    {
-        return $this->serverUrl . 'api/getMeetings?checksum=' . $this->getChecksum('getMeetings', '');
+        return $this->xmlResponse($this->getUrl('isMeetingRunning', $parameters));
     }
 
     /**
@@ -251,7 +216,7 @@ class Api
      */
     public function getMeetings()
     {
-        return $this->xmlResponse($this->getMeetingsUrl());
+        return $this->xmlResponse($this->getUrl('getMeetings'));
     }
 
     /**
@@ -277,8 +242,13 @@ class Api
      * @return SimpleXMLElement информация о конференции в виде объекта xml
      * @throws Exception
      */
-    public function getMeetingInfo($infoParameters)
+    public function getMeetingInfo($parameters)
     {
-        return $this->xmlResponse($this->getMeetingInfoUrl($infoParameters));
+        $parameters['meetingId'] = $this->requiredParameters($parameters['meetingId'], 'meetingId');
+        $parameters['password']  = $this->requiredParameters($parameters['password'], 'password');
+
+        return $this->xmlResponse($this->getUrl('getMeetingInfo', $parameters));
     }
+
+
 }
