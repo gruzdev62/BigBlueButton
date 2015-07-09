@@ -10,6 +10,7 @@ use SimpleXMLElement;
  * @package BigBlueButton
  * @author fkulakov
  * @email fkulakov@gmail.com
+ * @TODO: Реализовать возврат данных в JSON, XML или Array - на выбор.
  */
 class Api
 {
@@ -23,6 +24,8 @@ class Api
      */
     private $serverUrl;
 
+    private $responseFormat;
+
     /**
      * Просто конструктор. Задает значения полям $secretSalt и $serverUrl.
      */
@@ -30,6 +33,7 @@ class Api
     {
         $this->secretSalt = '8cd8ef52e8e101574e400365b55e11a6';
         $this->serverUrl  = 'http://test-install.blindsidenetworks.com/bigbluebutton/';
+        // $this->responseFormat = 'JSON';
     }
 
 
@@ -149,6 +153,19 @@ class Api
     }
 
     /**
+     * Проверяет, удачно ли выполнен запрос к api, и либо возвращает результат, либо выбрасывает исключение.
+     * @param SimpleXMLElement $resource ответ api.
+     */
+    private function getResult(SimpleXMLElement $resource)
+    {
+        if ($resource->returncode == 'FAILED') {
+            throw new Exception($resource->messageKey . ':' . $resource->message);
+        }
+
+        return $resource;
+    }
+
+    /**
      * Создает конференцию с заданными и возвращает информацию о ней
      * @param array $parameters [
      * ***************** name                    => Имя конференции,
@@ -174,7 +191,7 @@ class Api
     {
         $parameters['meetingID'] = $this->requiredParameters($parameters['meetingId'], 'meetingId');
 
-        return $this->xmlResponse($this->getUrl('create', $parameters), $xml);
+        return $this->getResult($this->xmlResponse($this->getUrl('create', $parameters), $xml));
     }
 
     /**
@@ -202,7 +219,7 @@ class Api
 
         $parameters = $this->implodeParameters($parameters);
 
-        return $this->xmlResponse($this->getUrl('join', $parameters));
+        return $this->getResult($this->xmlResponse($this->getUrl('join', $parameters)));
     }
 
     /**
@@ -219,7 +236,7 @@ class Api
         $parameters['meetingID'] = $this->requiredParameters($parameters['meetingID'], 'meetingID');
         $parameters['password']  = $this->requiredParameters($parameters['password'], 'password');
 
-        return $this->xmlResponse($this->getUrl('end', $parameters));
+        return $this->getResult($this->xmlResponse($this->getUrl('end', $parameters)));
     }
 
     /**
@@ -232,7 +249,7 @@ class Api
     {
         $parameters['meetingID'] = $this->requiredParameters($meetingID, 'meetingId');
 
-        return $this->xmlResponse($this->getUrl('isMeetingRunning', $parameters));
+        return $this->getResult($this->xmlResponse($this->getUrl('isMeetingRunning', $parameters)));
     }
 
     /**
@@ -242,7 +259,7 @@ class Api
      */
     public function getMeetings()
     {
-        return $this->xmlResponse($this->getUrl('getMeetings'));
+        return $this->getResult($this->xmlResponse($this->getUrl('getMeetings')));
     }
 
     /**
@@ -259,6 +276,6 @@ class Api
         $parameters['meetingID'] = $this->requiredParameters($parameters['meetingId'], 'meetingId');
         $parameters['password']  = $this->requiredParameters($parameters['password'], 'password');
 
-        return $this->xmlResponse($this->getUrl('getMeetingInfo', $parameters));
+        return $this->getResult($this->xmlResponse($this->getUrl('getMeetingInfo', $parameters)));
     }
 }
