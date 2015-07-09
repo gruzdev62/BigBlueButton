@@ -23,6 +23,9 @@ class Api
      */
     private $serverUrl;
 
+    /**
+     * @var string формат ответа api: XML или, по умолчанию, JSON
+     */
     private $responseFormat;
 
     /**
@@ -86,8 +89,6 @@ class Api
         }
 
         return $this->convertResponse(simplexml_load_file($url));
-
-
     }
 
     /**
@@ -138,6 +139,10 @@ class Api
         return $this->serverUrl . 'api/' . $methodName . '?checksum=' . $this->getChecksum($methodName, $parameters);
     }
 
+    /**
+     * @param $xml SimpleXMLElement, пришедший от api
+     * @return mixed JSON или неизменный XML
+     */
     private function convertResponse($xml)
     {
         if ($this->responseFormat == 'JSON') {
