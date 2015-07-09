@@ -31,9 +31,9 @@ class Api
      */
     public function __construct()
     {
-        $this->secretSalt = '8cd8ef52e8e101574e400365b55e11a6';
-        $this->serverUrl  = 'http://test-install.blindsidenetworks.com/bigbluebutton/';
-        // $this->responseFormat = 'JSON';
+        $this->secretSalt     = '8cd8ef52e8e101574e400365b55e11a6';
+        $this->serverUrl      = 'http://test-install.blindsidenetworks.com/bigbluebutton/';
+        $this->responseFormat = 'JSON';
     }
 
 
@@ -189,7 +189,7 @@ class Api
      */
     public function createMeeting($parameters, $xml = '')
     {
-        $parameters['meetingID'] = $this->requiredParameters($parameters['meetingId'], 'meetingId');
+        $parameters['meetingID'] = $this->requiredParameters($parameters['meetingID'], 'meetingID');
 
         return $this->getResult($this->xmlResponse($this->getUrl('create', $parameters), $xml));
     }
@@ -214,10 +214,8 @@ class Api
     public function joinMeeting($parameters)
     {
         $parameters['fullName']  = $this->requiredParameters($parameters['fullName'], 'fullName');
-        $parameters['meetingID'] = $this->requiredParameters($parameters['meetingID'], 'meetingId');
+        $parameters['meetingID'] = $this->requiredParameters($parameters['meetingID'], 'meetingID');
         $parameters['password']  = $this->requiredParameters($parameters['password'], 'password');
-
-        $parameters = $this->implodeParameters($parameters);
 
         return $this->getResult($this->xmlResponse($this->getUrl('join', $parameters)));
     }
@@ -247,7 +245,7 @@ class Api
      */
     public function isMeetingRunning($meetingID)
     {
-        $parameters['meetingID'] = $this->requiredParameters($meetingID, 'meetingId');
+        $parameters['meetingID'] = $this->requiredParameters($meetingID, 'meetingID');
 
         return $this->getResult($this->xmlResponse($this->getUrl('isMeetingRunning', $parameters)));
     }
@@ -273,7 +271,7 @@ class Api
      */
     public function getMeetingInfo($parameters)
     {
-        $parameters['meetingID'] = $this->requiredParameters($parameters['meetingId'], 'meetingId');
+        $parameters['meetingID'] = $this->requiredParameters($parameters['meetingID'], 'meetingID');
         $parameters['password']  = $this->requiredParameters($parameters['password'], 'password');
 
         return $this->getResult($this->xmlResponse($this->getUrl('getMeetingInfo', $parameters)));
