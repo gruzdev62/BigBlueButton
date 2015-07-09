@@ -153,19 +153,6 @@ class Api
     }
 
     /**
-     * Проверяет, удачно ли выполнен запрос к api, и либо возвращает результат, либо выбрасывает исключение.
-     * @param SimpleXMLElement $resource ответ api.
-     */
-    private function getResult(SimpleXMLElement $resource)
-    {
-        if ($resource->returncode == 'FAILED') {
-            throw new Exception($resource->messageKey . ':' . $resource->message);
-        }
-
-        return $resource;
-    }
-
-    /**
      * Создает конференцию с заданными и возвращает информацию о ней
      * @param array $parameters [
      * ***************** name                    => Имя конференции,
@@ -191,7 +178,7 @@ class Api
     {
         $parameters['meetingID'] = $this->requiredParameters($parameters['meetingID'], 'meetingID');
 
-        return $this->getResult($this->xmlResponse($this->getUrl('create', $parameters), $xml));
+        return $this->xmlResponse($this->getUrl('create', $parameters), $xml);
     }
 
     /**
@@ -217,7 +204,7 @@ class Api
         $parameters['meetingID'] = $this->requiredParameters($parameters['meetingID'], 'meetingID');
         $parameters['password']  = $this->requiredParameters($parameters['password'], 'password');
 
-        return $this->getResult($this->xmlResponse($this->getUrl('join', $parameters)));
+        return $this->xmlResponse($this->getUrl('join', $parameters));
     }
 
     /**
@@ -234,7 +221,7 @@ class Api
         $parameters['meetingID'] = $this->requiredParameters($parameters['meetingID'], 'meetingID');
         $parameters['password']  = $this->requiredParameters($parameters['password'], 'password');
 
-        return $this->getResult($this->xmlResponse($this->getUrl('end', $parameters)));
+        return $this->xmlResponse($this->getUrl('end', $parameters));
     }
 
     /**
@@ -247,7 +234,7 @@ class Api
     {
         $parameters['meetingID'] = $this->requiredParameters($meetingID, 'meetingID');
 
-        return $this->getResult($this->xmlResponse($this->getUrl('isMeetingRunning', $parameters)));
+        return $this->xmlResponse($this->getUrl('isMeetingRunning', $parameters));
     }
 
     /**
@@ -257,7 +244,7 @@ class Api
      */
     public function getMeetings()
     {
-        return $this->getResult($this->xmlResponse($this->getUrl('getMeetings')));
+        return $this->xmlResponse($this->getUrl('getMeetings'));
     }
 
     /**
@@ -274,6 +261,6 @@ class Api
         $parameters['meetingID'] = $this->requiredParameters($parameters['meetingID'], 'meetingID');
         $parameters['password']  = $this->requiredParameters($parameters['password'], 'password');
 
-        return $this->getResult($this->xmlResponse($this->getUrl('getMeetingInfo', $parameters)));
+        return $this->xmlResponse($this->getUrl('getMeetingInfo', $parameters));
     }
 }
