@@ -10,7 +10,6 @@ use SimpleXMLElement;
  * @package BigBlueButton
  * @author fkulakov
  * @email fkulakov@gmail.com
- * @TODO: Реализовать возврат данных в JSON, XML или Array - на выбор.
  */
 class Api
 {
@@ -86,7 +85,9 @@ class Api
             echo $error->getMessage();
         }
 
-        return simplexml_load_file($url);
+        return $this->convertResponse(simplexml_load_file($url));
+
+
     }
 
     /**
@@ -135,6 +136,17 @@ class Api
         }
 
         return $this->serverUrl . 'api/' . $methodName . '?checksum=' . $this->getChecksum($methodName, $parameters);
+    }
+
+    private function convertResponse($xml)
+    {
+        if ($this->responseFormat == 'JSON') {
+            $result = json_encode($xml);
+        } else {
+            $result = $xml;
+        }
+
+        return $result;
     }
 
     /**
