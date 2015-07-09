@@ -249,15 +249,3 @@ class Api
         return $this->xmlResponse($this->getUrl('getMeetingInfo', $parameters));
     }
 }
-$bbb = new Api();
-echo '<pre>';
-//var_dump($bbb->getMeetings());
-
-$parameters = [
-    'meetingID' => 'ae7c2b78d758ffc1b67c6c30d7107406-62-16',
-    'password'  => 'b87224d47b2f97b7ba698e10aaffd0bc',
-    'fullName'  => 'La la la',
-    'redirect'  => 'true'
-];
-
-var_dump($bbb->joinMeeting($parameters));
