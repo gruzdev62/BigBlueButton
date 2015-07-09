@@ -83,7 +83,7 @@ class Api
             }
 
         } catch (Exception $error) {
-            // echo $error->getMessage();
+            echo $error->getMessage();
         }
 
         return simplexml_load_file($url);
@@ -110,21 +110,6 @@ class Api
     }
 
     /**
-     * Преобразует массив с параметрами в строку запроса.
-     * @param array $parameters массив с параметрами
-     * @return string строка запроса
-     */
-    private function implodeParameters($parameters)
-    {
-        $result = '';
-        foreach ($parameters as $name => $parameter) {
-            $result .= $name . '=' . urlencode(trim($parameter)) . '&';
-        }
-
-        return substr($result, 0, strlen($result) - 1);
-    }
-
-    /**
      * Генерирует секретный ключ, защищающий запрос к api.
      * @param string $methodName метод, для которого генерируется ключ
      * @param string $parameters передаваемые параметры
@@ -144,7 +129,7 @@ class Api
     private function getUrl($methodName, $parameters = '')
     {
         if ($parameters != '' && is_array($parameters)) {
-            $parameters = $this->implodeParameters($parameters);
+            $parameters = http_build_query($parameters);
 
             return $this->serverUrl . 'api/' . $methodName . '?' . $parameters . '&checksum=' . $this->getChecksum($methodName, $parameters);
         }
@@ -264,3 +249,15 @@ class Api
         return $this->xmlResponse($this->getUrl('getMeetingInfo', $parameters));
     }
 }
+$bbb = new Api();
+echo '<pre>';
+//var_dump($bbb->getMeetings());
+
+$parameters = [
+    'meetingID' => 'ae7c2b78d758ffc1b67c6c30d7107406-62-16',
+    'password'  => 'b87224d47b2f97b7ba698e10aaffd0bc',
+    'fullName'  => 'La la la',
+    'redirect'  => 'true'
+];
+
+var_dump($bbb->joinMeeting($parameters));
