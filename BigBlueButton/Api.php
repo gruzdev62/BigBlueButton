@@ -43,7 +43,7 @@ class Api
      * @return SimpleXMLElement ответ сервера в виде объекта xml.
      * @throws Exception
      */
-    private function xmlResponse($url, $xml = '')
+    private function getResponse($url, $xml = '')
     {
         if (!extension_loaded('curl') && !empty($xml)) {
             throw new Exception('Curl does not installed.');
@@ -175,7 +175,7 @@ class Api
     {
         $parameters['meetingID'] = $this->requiredParameters($parameters['meetingID'], 'meetingID');
 
-        return $this->xmlResponse($this->getUrl('create', $parameters), $xml);
+        return $this->getResponse($this->getUrl('create', $parameters), $xml);
     }
 
     /**
@@ -201,7 +201,7 @@ class Api
         $parameters['meetingID'] = $this->requiredParameters($parameters['meetingID'], 'meetingID');
         $parameters['password']  = $this->requiredParameters($parameters['password'], 'password');
 
-        return $this->xmlResponse($this->getUrl('join', $parameters));
+        return $this->getResponse($this->getUrl('join', $parameters));
     }
 
     /**
@@ -218,7 +218,7 @@ class Api
         $parameters['meetingID'] = $this->requiredParameters($parameters['meetingID'], 'meetingID');
         $parameters['password']  = $this->requiredParameters($parameters['password'], 'password');
 
-        return $this->xmlResponse($this->getUrl('end', $parameters));
+        return $this->getResponse($this->getUrl('end', $parameters));
     }
 
     /**
@@ -231,7 +231,7 @@ class Api
     {
         $parameters['meetingID'] = $this->requiredParameters($meetingID, 'meetingID');
 
-        return $this->xmlResponse($this->getUrl('isMeetingRunning', $parameters));
+        return $this->getResponse($this->getUrl('isMeetingRunning', $parameters));
     }
 
     /**
@@ -241,7 +241,7 @@ class Api
      */
     public function getMeetings()
     {
-        return $this->xmlResponse($this->getUrl('getMeetings'));
+        return $this->getResponse($this->getUrl('getMeetings'));
     }
 
     /**
@@ -258,6 +258,6 @@ class Api
         $parameters['meetingID'] = $this->requiredParameters($parameters['meetingID'], 'meetingID');
         $parameters['password']  = $this->requiredParameters($parameters['password'], 'password');
 
-        return $this->xmlResponse($this->getUrl('getMeetingInfo', $parameters));
+        return $this->getResponse($this->getUrl('getMeetingInfo', $parameters));
     }
 }
